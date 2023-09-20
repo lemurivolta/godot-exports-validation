@@ -5,20 +5,16 @@ using Godot;
 using System;
 using System.Reflection;
 
-public partial class ValidationInfo
+public partial class ValidationInfo(MemberInfo memberInfo, Node node)
 {
-    public readonly MemberInfo MemberInfo;
-    public readonly Node Node;
-
-    public ValidationInfo(MemberInfo memberInfo, Node node)
-    {
-        MemberInfo = memberInfo;
-        Node = node;
-    }
+#pragma warning disable CA1822 // Mark members as static
+    public MemberInfo MemberInfo => memberInfo;
+    public Node Node => node;
+#pragma warning restore CA1822 // Mark members as static
 
     public object Value => Switch(
-        fieldInfo => fieldInfo.GetValue(Node),
-        propertyInfo => propertyInfo.GetValue(Node));
+        fieldInfo => fieldInfo.GetValue(Node)!,
+        propertyInfo => propertyInfo.GetValue(Node)!);
 
     public string MemberName => MemberInfo.Name;
 
@@ -31,11 +27,11 @@ public partial class ValidationInfo
     private T Switch<T>(
         Func<FieldInfo, T> fieldInfoAction,
         Func<PropertyInfo, T> propertyInfoAction,
-        Func<MemberInfo, T> memberInfoAction = null)
+        Func<MemberInfo, T>? memberInfoAction = null)
     {
         static T DefaultMemberInfoAction(MemberInfo memberInfo)
         {
-            throw new Exception($"Unknown member info type ${memberInfo.GetType().Name}");
+            throw new ValidationFailedException($"Unknown member info type ${memberInfo.GetType().Name}");
         };
         if (MemberInfo is FieldInfo fieldInfo)
         {

@@ -9,15 +9,15 @@ public partial class ValidateNotEmptyAttribute : NodeValidationBaseAttribute
     {
         if (validationInfo.Value == null)
         {
-            throw new Exception("is null");
+            throw new ValidationFailedException("is null");
         }
         if (validationInfo.Value is not string s)
         {
-            throw new Exception($"can only check strings");
+            throw new ValidationFailedException("can only check strings");
         }
         if (string.IsNullOrEmpty(s))
         {
-            throw new Exception("is empty");
+            throw new ValidationFailedException("is empty");
         }
     }
 }

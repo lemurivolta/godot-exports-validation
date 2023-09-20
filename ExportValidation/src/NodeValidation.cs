@@ -22,7 +22,7 @@ public static class NodeValidation
                 {
                     attribute.Validate(validationInfo);
                 }
-                catch (Exception e)
+                catch (ValidationFailedException e)
                 {
                     exceptions.Add($"{validationInfo.NodePath} - {validationInfo.MemberName}: {e.Message}");
                 }
@@ -31,7 +31,8 @@ public static class NodeValidation
 
         if (exceptions.Count > 0)
         {
-            throw new Exception("\n" + string.Join('\n', exceptions));
+            throw new ValidationFailedException(
+                "\n" + string.Join('\n', exceptions));
         }
     }
 }

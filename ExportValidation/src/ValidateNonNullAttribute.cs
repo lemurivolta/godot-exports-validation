@@ -9,7 +9,7 @@ public class ValidateNonNullAttribute : NodeValidationBaseAttribute
     {
         if(validationInfo.Value == null)
         {
-            throw new Exception($"cannot be null");
+            throw new ValidationFailedException("cannot be null");
         }
     }
 }

@@ -5,16 +5,16 @@ using System;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
 public partial class ValidateRange : NodeValidationBaseAttribute
 {
-    public double Min = double.MinValue;
-    public bool MinInclusive = true;
-    public double Max = double.MaxValue;
-    public bool MaxInclusive = true;
+    public double Min { get; set; } = double.MinValue;
+    public bool MinInclusive { get; set; } = true;
+    public double Max { get; set; } = double.MaxValue;
+    public bool MaxInclusive { get; set; } = true;
 
     public override void Validate(ValidationInfo validationInfo)
     {
         if (Min >= Max)
         {
-            throw new Exception("Min must be less than Max");
+            throw new ValidationFailedException("Min must be less than Max");
         }
 
         var memberType = validationInfo.MemberType;
@@ -24,25 +24,26 @@ public partial class ValidateRange : NodeValidationBaseAttribute
             !memberType.IsAssignableTo(typeof(decimal))
             )
         {
-            throw new Exception($"Can check range only of float, double int and decimals, not of {memberType.Name}");
+            throw new ValidationFailedException(
+                $"Can check range only of float, double int and decimals, not of {memberType.Name}");
         }
 
         var value = ToDouble(validationInfo.Value);
         if (MinInclusive && value < Min)
         {
-            throw new Exception($"must be greater or equal than {Min}");
+            throw new ValidationFailedException($"must be greater or equal than {Min}");
         }
         if (!MinInclusive && value <= Min)
         {
-            throw new Exception($"must be greater than {Min}");
+            throw new ValidationFailedException($"must be greater than {Min}");
         }
         if (MaxInclusive && value > Max)
         {
-            throw new Exception($"must be less or equal than {Max}");
+            throw new ValidationFailedException($"must be less or equal than {Max}");
         }
         if (!MaxInclusive && value >= Max)
         {
-            throw new Exception($"must be less than {Max}");
+            throw new ValidationFailedException($"must be less than {Max}");
         }
     }
 
@@ -66,7 +67,7 @@ public partial class ValidateRange : NodeValidationBaseAttribute
         }
         else
         {
-            throw new Exception();
+            throw new ArgumentException("Unknown type", nameof(value));
         }
     }
 }

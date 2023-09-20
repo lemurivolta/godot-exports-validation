@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Nullable>enable</Nullable>
     <CopyAllFiles>true</CopyAllFiles>
-    <RootNamespace>ExportValidation</RootNamespace>
+    <RootNamespace>LemuRivolta.ExportValidation</RootNamespace>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OutputPath>./nupkg</OutputPath>
     <DebugType>portable</DebugType>
@@ -28,7 +28,8 @@
 
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl></RepositoryUrl>
-    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <AnalysisLevel>6.0-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>

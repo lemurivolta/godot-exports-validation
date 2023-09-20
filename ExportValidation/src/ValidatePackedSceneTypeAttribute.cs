@@ -5,32 +5,27 @@ using Godot;
 using System;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public class ValidatePackedSceneTypeAttribute : NodeValidationBaseAttribute
+public class ValidatePackedSceneTypeAttribute(Type type) : NodeValidationBaseAttribute
 {
-    private readonly Type type;
-
-    public ValidatePackedSceneTypeAttribute(Type type)
-    {
-        this.type = type;
-    }
-
     public override void Validate(ValidationInfo validationInfo)
     {
         if (validationInfo.Value is not PackedScene packedScene)
         {
-            throw new Exception($"Can apply ValidatePackedSceneType attribute only to members of type PackedScene, not {validationInfo.MemberType.Name}");
+            throw new ValidationFailedException(
+                $"can apply ValidatePackedSceneType attribute only to members of type PackedScene, not {validationInfo.MemberType.Name}");
         }
 
         var packedSceneType = CheckPackedScene(packedScene) ??
-            throw new Exception("no script attached to the packed scene");
+            throw new ValidationFailedException(
+                "no script attached to the packed scene");
         if (!type.IsAssignableFrom(packedSceneType))
         {
-            throw new Exception(
+            throw new ValidationFailedException(
                 $"should be a {type.FullName}, instead is a {packedSceneType.FullName}");
         }
     }
 
-    private static Type CheckPackedScene(PackedScene packedScene)
+    private static Type? CheckPackedScene(PackedScene packedScene)
     {
         var sceneState = packedScene.GetState();
         for (var i = 0; i < sceneState.GetNodeCount(); i++)

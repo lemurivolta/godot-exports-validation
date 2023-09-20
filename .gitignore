@@ -1,0 +1,11 @@
+ExportValidation/nupkg/
+
+ExportValidation.Tests/coverage/*
+!ExportValidation.Tests/coverage/.gdignore
+
+.godot/
+bin/
+obj/
+.generated/
+.vs/
+.DS_Store

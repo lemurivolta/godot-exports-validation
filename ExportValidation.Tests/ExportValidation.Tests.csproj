@@ -17,6 +17,7 @@
     -->
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <AnalysisLevel>6.0-recommended</AnalysisLevel>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Chickensoft.GoDotTest" Version="1.2.1" />

@@ -9,7 +9,7 @@ public static class NodeValidation
 {
     public static void Validate(this Node node)
     {
-        List<string> exceptions = new();
+        List<ValidationFailureInfo> info = new();
         foreach (FieldInfo field in node.GetType().GetFields(BindingFlags.Public |
             BindingFlags.NonPublic |
             BindingFlags.Instance))
@@ -23,15 +23,14 @@ public static class NodeValidation
                 }
                 catch (ValidationFailedException e)
                 {
-                    exceptions.Add($"{validationInfo.NodePath} - {validationInfo.MemberName}: {e.Message}");
+                    info.Add(new(validationInfo.NodePath, validationInfo.MemberName, e.Message));
                 }
             }
         }
 
-        if (exceptions.Count > 0)
+        if (info.Count > 0)
         {
-            throw new ValidationFailedException(
-                "\n" + string.Join('\n', exceptions));
+            throw new FullValidationException(info);
         }
     }
 }

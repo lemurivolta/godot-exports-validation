@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "ExportValidation.Tests": {
+      "commandName": "Project"
+    },
+    "Run GoDotTests": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\mbelletti\\GodotInstallations\\Godot_v4.1.1-stable_mono_win64\\Godot_v4.1.1-stable_mono_win64.exe",
+      "commandLineArgs": "--headless --run-tests --path C:\\Users\\mbelletti\\source\\repos\\godot\\export-validations\\ExportValidation.Tests --quit-on-finish",
+      "workingDirectory": "C:\\Users\\mbelletti\\source\\repos\\godot\\export-validations\\ExportValidation.Tests"
+    }
+  }
+}

@@ -54,6 +54,7 @@
     "typeparam",
     "typeparamref",
     "ulong",
-    "Xunit"
+    "Xunit",
+    "LemuRivolta"
   ]
 }

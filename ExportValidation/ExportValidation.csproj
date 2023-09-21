@@ -31,6 +31,11 @@
     <AnalysisLevel>6.0-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <None Remove="src\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="\" />
@@ -41,9 +46,5 @@
   <ItemGroup>
     <!-- Dependencies go here. -->
     <PackageReference Include="GodotSharp" Version="4.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="src\" />
   </ItemGroup>
 </Project>

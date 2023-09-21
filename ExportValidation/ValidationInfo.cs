@@ -1,6 +1,7 @@
 namespace LemuRivolta.ExportValidation;
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 
 using Godot;
@@ -38,7 +39,7 @@ public partial class ValidationInfo
     {
         static T DefaultMemberInfoAction(MemberInfo memberInfo)
         {
-            throw new ValidationFailedException($"Unknown member info type ${memberInfo.GetType().Name}");
+            throw new InvalidOperationException();
         };
         if (MemberInfo is FieldInfo fieldInfo)
         {

@@ -1,15 +1,11 @@
 namespace LemuRivolta.ExportValidation;
 
 using System;
+using System.Collections.Generic;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public class ValidateNonNullAttribute : NodeValidationBaseAttribute
 {
-    public override void Validate(ValidationInfo validationInfo)
-    {
-        if (validationInfo.Value == null)
-        {
-            throw new ValidationFailedException("cannot be null");
-        }
-    }
+    public override ValidationError? Validate(ValidationInfo validationInfo) =>
+        validationInfo.Value == null ? new("cannot be null") : null;
 }

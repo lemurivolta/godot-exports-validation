@@ -10,11 +10,11 @@ public partial class ValidateRange : NodeValidationBaseAttribute
     public double Max { get; set; } = double.MaxValue;
     public bool MaxInclusive { get; set; } = true;
 
-    public override void Validate(ValidationInfo validationInfo)
+    public override ValidationError? Validate(ValidationInfo validationInfo)
     {
         if (Min >= Max)
         {
-            throw new ValidationFailedException("Min must be less than Max");
+            return new("Min must be less than Max");
         }
 
         var memberType = validationInfo.MemberType;
@@ -24,50 +24,37 @@ public partial class ValidateRange : NodeValidationBaseAttribute
             !memberType.IsAssignableTo(typeof(decimal))
             )
         {
-            throw new ValidationFailedException(
+            return new(
                 $"Can check range only of float, double int and decimals, not of {memberType.Name}");
         }
 
         var value = ToDouble(validationInfo.Value);
         if (MinInclusive && value < Min)
         {
-            throw new ValidationFailedException($"must be greater or equal than {Min}");
+            return new($"must be greater or equal than {Min}");
         }
         if (!MinInclusive && value <= Min)
         {
-            throw new ValidationFailedException($"must be greater than {Min}");
+            return new($"must be greater than {Min}");
         }
         if (MaxInclusive && value > Max)
         {
-            throw new ValidationFailedException($"must be less or equal than {Max}");
+            return new($"must be less or equal than {Max}");
         }
         if (!MaxInclusive && value >= Max)
         {
-            throw new ValidationFailedException($"must be less than {Max}");
+            return new($"must be less than {Max}");
         }
+
+        return null;
     }
 
-    private static double ToDouble(object value)
+    private static double ToDouble(object value) => value switch
     {
-        if (value is float f)
-        {
-            return f;
-        }
-        else if (value is int i)
-        {
-            return i;
-        }
-        else if (value is decimal d)
-        {
-            return (double)d;
-        }
-        else if (value is double dd)
-        {
-            return dd;
-        }
-        else
-        {
-            throw new ArgumentException("Unknown type", nameof(value));
-        }
-    }
+        float f => f,
+        int i => i,
+        decimal d => (double)d,
+        double dd => dd,
+        _ => throw new ArgumentException("Unknown type", nameof(value)),
+    };
 }

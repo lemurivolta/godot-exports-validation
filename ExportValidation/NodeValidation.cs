@@ -17,13 +17,13 @@ public static class NodeValidation
             foreach (var attribute in field.GetCustomAttributes<NodeValidationBaseAttribute>())
             {
                 ValidationInfo validationInfo = new(field, node);
-                try
+                var validationError = attribute.Validate(validationInfo);
+                if (validationError != null)
                 {
-                    attribute.Validate(validationInfo);
-                }
-                catch (ValidationFailedException e)
-                {
-                    info.Add(new(validationInfo.NodePath, validationInfo.MemberName, e.Message));
+                    info.Add(new(
+                        validationInfo.NodePath,
+                        validationInfo.MemberName,
+                        validationError.Message));
                 }
             }
         }

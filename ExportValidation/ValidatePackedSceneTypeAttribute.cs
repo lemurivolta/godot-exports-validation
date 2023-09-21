@@ -1,6 +1,8 @@
 namespace LemuRivolta.ExportValidation;
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using Godot;
 
@@ -11,28 +13,22 @@ public class ValidatePackedSceneTypeAttribute : NodeValidationBaseAttribute
 
     public ValidatePackedSceneTypeAttribute(Type type)
     {
-        this.type = type;
+        this.type = type ??
+            throw new ArgumentNullException(nameof(type), "cannot be null");
     }
 
-    public override void Validate(ValidationInfo validationInfo)
-    {
-        if (validationInfo.Value is not PackedScene packedScene)
-        {
-            throw new ValidationFailedException(
-                $"can apply ValidatePackedSceneType attribute only to members of type PackedScene, not {validationInfo.MemberType.Name}");
-        }
+    public override ValidationError? Validate(ValidationInfo validationInfo) =>
+        validationInfo.Value is not PackedScene packedScene ?
+            new($"can only validate PackedScenes, not {validationInfo.MemberType.Name}") :
+        !TryGetPackedSceneType(packedScene, out var packedSceneType) ?
+            new("no script attached to the packed scene") :
+        !type.IsAssignableFrom(packedSceneType) ?
+            new($"Cannot assign a '{packedSceneType.FullName}' to a '{type.FullName}'") :
+            null;
 
-        var packedSceneType = CheckPackedScene(packedScene) ??
-            throw new ValidationFailedException(
-                "no script attached to the packed scene");
-        if (!type.IsAssignableFrom(packedSceneType))
-        {
-            throw new ValidationFailedException(
-                $"should be a {type.FullName}, instead is a {packedSceneType.FullName}");
-        }
-    }
-
-    private static Type? CheckPackedScene(PackedScene packedScene)
+    private static bool TryGetPackedSceneType(
+        PackedScene packedScene,
+        [NotNullWhen(true)] out Type? type)
     {
         var sceneState = packedScene.GetState();
         for (var i = 0; i < sceneState.GetNodeCount(); i++)
@@ -56,12 +52,14 @@ public class ValidatePackedSceneTypeAttribute : NodeValidationBaseAttribute
                     {
                         var instance = cSharpScript.New();
                         var go = instance.AsGodotObject();
-                        return go.GetType();
+                        type = go.GetType();
+                        return true;
                     }
                 }
                 break;
             }
         }
-        return null;
+        type = null;
+        return false;
     }
 }

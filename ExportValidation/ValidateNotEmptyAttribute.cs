@@ -1,23 +1,15 @@
 namespace LemuRivolta.ExportValidation;
 
 using System;
+using System.Collections.Generic;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public partial class ValidateNotEmptyAttribute : NodeValidationBaseAttribute
 {
-    public override void Validate(ValidationInfo validationInfo)
-    {
-        if (validationInfo.Value == null)
-        {
-            throw new ValidationFailedException("is null");
-        }
-        if (validationInfo.Value is not string s)
-        {
-            throw new ValidationFailedException("can only check strings");
-        }
-        if (string.IsNullOrEmpty(s))
-        {
-            throw new ValidationFailedException("is empty");
-        }
-    }
+    public override ValidationError? Validate(ValidationInfo validationInfo) =>
+        validationInfo.Value == null ? new("is null") :
+        validationInfo.Value is not string s ? new("can only check strings") :
+        string.IsNullOrEmpty(s) ? new("is empty") :
+        null;
+
 }

@@ -7,7 +7,7 @@ public class ValidateNonNullAttribute : NodeValidationBaseAttribute
 {
     public override void Validate(ValidationInfo validationInfo)
     {
-        if(validationInfo.Value == null)
+        if (validationInfo.Value == null)
         {
             throw new ValidationFailedException("cannot be null");
         }

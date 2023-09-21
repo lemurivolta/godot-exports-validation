@@ -1,16 +1,23 @@
 namespace LemuRivolta.ExportValidation;
 
-using Godot;
-
 using System;
 using System.Reflection;
 
-public partial class ValidationInfo(MemberInfo memberInfo, Node node)
+using Godot;
+
+public partial class ValidationInfo
 {
-#pragma warning disable CA1822 // Mark members as static
+    private readonly MemberInfo memberInfo;
+    private readonly Node node;
+
     public MemberInfo MemberInfo => memberInfo;
     public Node Node => node;
-#pragma warning restore CA1822 // Mark members as static
+
+    public ValidationInfo(MemberInfo memberInfo, Node node)
+    {
+        this.memberInfo = memberInfo;
+        this.node = node;
+    }
 
     public object Value => Switch(
         fieldInfo => fieldInfo.GetValue(Node)!,

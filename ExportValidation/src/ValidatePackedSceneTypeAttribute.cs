@@ -1,12 +1,19 @@
 namespace LemuRivolta.ExportValidation;
 
-using Godot;
-
 using System;
 
+using Godot;
+
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public class ValidatePackedSceneTypeAttribute(Type type) : NodeValidationBaseAttribute
+public class ValidatePackedSceneTypeAttribute : NodeValidationBaseAttribute
 {
+    private readonly Type type;
+
+    public ValidatePackedSceneTypeAttribute(Type type)
+    {
+        this.type = type;
+    }
+
     public override void Validate(ValidationInfo validationInfo)
     {
         if (validationInfo.Value is not PackedScene packedScene)

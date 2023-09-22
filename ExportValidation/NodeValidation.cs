@@ -8,7 +8,7 @@ using Godot;
 public static class NodeValidation
 {
     public static void Validate(this Node node)
-    {
+    { 
         List<ValidationFailureInfo> info = new();
         foreach (FieldInfo field in node.GetType().GetFields(BindingFlags.Public |
             BindingFlags.NonPublic |

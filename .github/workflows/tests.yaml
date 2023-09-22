@@ -59,12 +59,12 @@ jobs:
           godot --version
 
       - name: 🧑‍🔬 Generate .NET Bindings
-        working-directory: ExportValidation.Tests
+        working-directory: ExportsValidation.Tests
         run: godot --headless --build-solutions --quit || exit 0
 
       - name: 🦺 Build Projects
         run: dotnet build
 
       - name: 🧪 Run Tests
-        working-directory: ExportValidation.Tests
+        working-directory: ExportsValidation.Tests
         run: godot --headless --run-tests --quit-on-finish

@@ -16,7 +16,7 @@
         "--run-tests",
         "--quit-on-finish"
       ],
-      "cwd": "${workspaceFolder}/ExportValidation.Tests",
+      "cwd": "${workspaceFolder}/ExportsValidation.Tests",
       "stopAtEntry": false,
     },
     {
@@ -30,7 +30,7 @@
         "--run-tests=${fileBasenameNoExtension}",
         "--quit-on-finish"
       ],
-      "cwd": "${workspaceFolder}/ExportValidation.Tests",
+      "cwd": "${workspaceFolder}/ExportsValidation.Tests",
       "stopAtEntry": false,
     },
   ]

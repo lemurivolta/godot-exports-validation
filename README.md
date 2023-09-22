@@ -1,164 +1,123 @@
-# ExportValidation
+# Exports Validation
 
-[![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] [![Read the docs][read-the-docs-badge]][docs] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
+![line coverage][line-coverage] ![branch coverage][branch-coverage]
 
-A .NET template for quickly creating a C# nuget package for use with Godot 4.
+A .NET package to easily **validate exports field in your Godot C# Scripts**.
+
+Validation allows you to immediately see if there's something wrong with the setup of your nodes, before getting cryptic messages five minutes into a debugging session.
 
 ---
 
 <p align="center">
-<img alt="ExportValidation" src="ExportValidation/icon.png" width="200">
+<img alt="ExportsValidation" src="ExportsValidation/icon.svg" width="200">
 </p>
 
-## 🥚 Getting Started
+## Quick Start
 
-This template allows you to easily create a nuget package for use in Godot 4 C# projects. Microsoft's `dotnet` tool allows you to easily create, install, and use templates.
+Want to try it out? Quickly get your project to use Exports Validation!
 
-```sh
-# Install this template
-dotnet new --install ExportValidation
+1. *Install the NuGet package*. You can search for **LemuRivolta.ExportsValidation** using [Visual Studio](https://learn.microsoft.com/en-us/nuget/quickstart/install-and-use-a-package-in-visual-studio#nuget-package-manager), [VSCode](https://code.visualstudio.com/docs/csharp/package-management) or do it on the [command line](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-install).
+2. *Add some validation attributes* to your fields or properties, like this:
+  ```csharp
+  [Export, ValidateNonNull]
+  private Path path;
 
-# Generate a new project based on this template
-dotnet new chickenpackage --name "MyPackageName" --param:author "My Name"
+  [Export, ValidateNotEmpty]
+  private string name;
 
-# Use Godot to generate files needed to compile the package's test project.
-cd MyPackageName/MyPackageName.Tests/
-godot4 --headless --build-solutions --quit
-dotnet build
+  [Export]
+  [ValidatePackedSceneType(typeof(Bullet))]
+  private PackedScene bulletPackedScene;
+
+  [Export]
+  [ValidateRange(Min = 0, MinInclusive = false)]
+  private float speed;
+  ```
+3. Remember to *call Validate*! Tipically, you want to do this on _Ready:
+  ```csharp
+  public override void _Ready() {
+    // extension method, it required "this."
+    this.Validate();
+  }
+  ```
+4. **You're done!**
+
+# Supported validators
+
+All validators are expressed as attributes, and work on both properties and on fields.
+
+Here is the list of the currently available validators.
+
+## `ValidateNonNull`
+
+This validator checks that the field (or property) is **not null**. It takes no arguments and has no properties.
+
+## `ValidateNotEmpty`
+
+This validator checks that a **`string` is not empty**.
+
+By default, strings only made of whitespaces are considered empty too. You can pass `NoWhiteSpace = false` as a property to the attribute to disable this behaviour.
+
+E.g.:
+
+```csharp
+[ValidateNotEmpty]
+public string? Value = "hello";
+
+[ValidateNotEmpty(NoWhiteSpace = false)]
+public string? ValueThatAcceptsWhiteSpaces =
+  "   ";
 ```
 
-## 💁 Getting Help
+## `ValidateRange`
 
-*Is this template broken? Encountering obscure C# build problems?* We'll be happy to help you in the [Chickensoft Discord server][discord].
+This validator checks that a **numeric field (or property) is within a given range**.
 
-## 🏝 Environment Setup
+Ranges are expressed using arguments `min` and `max`. You can pass just min or just max, if the other end of the range must not be checked.
 
-For the provided debug configurations and test coverage to work correctly, you must setup your development environment correctly. The [Chickensoft Setup Docs][setup-docs] describe how to setup your Godot and C# development environment, following Chickensoft's best practices.
+By default, all ranges are inclusive. The `minInclusive` and `maxInclusive` arguments are flags that can be set to `false` so that the respective extreme is not considered valid for the range.
 
-### VSCode Settings
+Supported numeric types are `int`, `float`, `double` and `decimal`.
 
-This template includes some Visual Studio Code settings in `.vscode/settings.json`. The settings facilitate terminal environments on Windows (Git Bash, PowerShell, Command Prompt) and macOS (zsh), as well as fixing some syntax colorization issues that Omnisharp suffers from. You'll also find settings that enable editor config support in Omnisharp and the .NET Roslyn analyzers for a more enjoyable coding experience.
+E.g.:
 
-> Please double-check that the provided VSCode settings don't conflict with your existing settings.
+```csharp
+[ValidateRange(min: 0)]
+public int ValueRangeMinInclusive0 = 0;
 
-## .NET Versioning
+[ValidateRange(min: 0, minInclusive: false)]
+public float ValueRangeMinExclusive0 = 1;
 
-The included [`global.json`](./global.json) specifies the version of the .NET SDK that the included projects should use. It also specifies the `Godot.NET.Sdk` version that the included test project should use (since tests run inside an actual Godot game so you can use the full Godot API to verify your package is working as intended).
+[ValidateRange(max: 10)]
+public double ValueRangeMaxInclusive0 = 10;
 
-## 🐞 Debugging
+[ValidateRange(max: 10, maxInclusive: false)]
+public decimal ValueRangeMaxExclusive0 = 9;
 
-You can debug the included test project for your package in `ExportValidation.Tests/` by opening the root of this repository in VSCode and selecting one of the launch configurations: `Debug Tests` or `Debug Current Test`.
-
-> For the launch profile `Debug Current Test` to work, your test file must share the same name as the test class inside of it. For example, a test class named `PackageTest` must reside in a test file named `PackageTest.cs`.
-
-The launch profiles will trigger a build (without restoring packages) and then instruct .NET to run Godot 4 (while communicating with VSCode for interactive debugging).
-
-> **Important:** You must setup a `GODOT4` environment variable for the launch configurations above. If you haven't done so already, please see the [Chickensoft Setup Docs][setup-docs].
-
-## 👷 Testing
-
-By default, a test project in `ExportValidation.Tests/` is created for you to write tests for your package. [GoDotTest] is already included and setup, allowing you to focus on development and testing.
-
-[GoDotTest] is an easy-to-use testing framework for Godot and C# that allows you to run tests from the command line, collect code coverage, and debug tests in VSCode.
-
-The project is configured to allow tests to be easily run and debugged from VSCode or executed via CI/CD workflows, without having to include the test files or test dependencies in the final release build.
-
-The `Main.tscn` and `Main.cs` scene and script file are the entry point of your game. In general, you probably won't need to modify these unless you're doing something highly custom. If the game isn't running in test mode (or it's a release build), it will just immediately change the scene to `game/Game.tscn`. In general, prefer editing `game/Game.tscn` over `Main.tscn`.
-If you run Godot with the `--run-tests` command line argument, the game will run the tests instead of switching to the game scene located at `game/Game.tscn`. The provided debug configurations in `.vscode/launch.json` allow you to easily debug tests (or just the currently open test, provided its filename matches its class name).
-
-Please see `test/ExampleTest.cs` and the [GoDotTest] readme for more examples.
-
-## 🚦 Test Coverage
-
-Code coverage requires a few `dotnet` global tools to be installed first. You should install these tools from the root of the project directory.
-
-The `nuget.config` file in the root of the project allows the correct version of `coverlet` to be installed from the coverlet nightly distributions. Overriding the coverlet version will be required [until coverlet releases a stable version with the fixes that allow it to work with Godot 4][coverlet-issues].
-
-```sh
-dotnet tool install --global coverlet.console
-dotnet tool update --global coverlet.console
-dotnet tool install --global dotnet-reportgenerator-globaltool
-dotnet tool update --global dotnet-reportgenerator-globaltool
+[ValidateRange(min: 0, max: 10, maxInclusive: false)]
+public int ValueRangeMinInclusive0MaxExclusive0 = 5;
 ```
 
-> Running `dotnet tool update` for the global tool is often necessary on Apple Silicon computers to ensure the tools are installed correctly.
+## `ValidatePackedSceneType`
 
-You can collect code coverage and generate coverage badges by running the bash script in `test/coverage.sh` (on Windows, you can use the Git Bash shell that comes with git).
+This validator checks that a **PackedScene field (or property) points to a scene that is of the given type**. The type is passed as its only argument.
 
-```sh
-# Must give coverage script permission to run the first time it is used.
-chmod +x test/.coverage.sh
+E.g.:
 
-# Run code coverage:
-cd ExportValidation.Tests
-./coverage.sh
+```csharp
+[ValidatePackedSceneType(typeof(PuzzlePiece))]
+public PackedScene? PuzzlePieceScene = null;
 ```
 
-You can also run test coverage through VSCode by opening the command palette and selecting `Tasks: Run Task` and then choosing `coverage`.
+The check `[ValidatePackedSceneType(typeof(MyScript))]` is satisfied if the root node of the PackedScene has a C# script attached to it of type `MyScript`, or of a type derived from `MyScript`.
 
-## 🏭 CI/CD
+In other words, instances of the packed scene must be assignable to variables ot type `MyScript`.
 
-This package includes various GitHub Actions workflows to make developing and deploying your package easier.
-
-### 🚥 Tests
-
-Tests run on every push or pull request to the repository. You can configure which platforms you want to run tests on in [`.github/workflows/tests.yaml`](.github/workflows/tests.yaml).
-
-By default, tests run each platform (macOS, Windows, and Linux) using the latest beta version of Godot 4.
-
-Tests are executed by running the Godot test project in `ExportValidation.Tests` from the command line and passing in the relevant arguments to Godot so that [GoDotTest] can discover and run tests.
-
-### 🧑‍🏫 Spellcheck
-
-A spell check runs on every push or pull request to the repository. Spellcheck settings can be configured in [`.github/workflows/spellcheck.yaml`](.github/workflows/spellcheck.yaml)
-
-The [Code Spell Checker][cspell] plugin for VSCode is recommended to help you catch typos before you commit them. If you need add a word to the dictionary, you can add it to the `cspell.json` file.
-
-You can also words to the local `cspell.json` file from VSCode by hovering over a misspelled word and selecting `Quick Fix...` and then `Add "{word}" to config: GodotPackage/cspell.json`.
-
-![Fix Spelling](docs/spelling_fix.png)
-
-### 📦 Publish
-
-The included workflow in [`.github/workflows/publish.yaml`](.github/workflows/publish.yaml) can be manually dispatched when you're ready to publish your package to Nuget.
-
-The accompanying [`.github/workflows/auto_release.yaml`](.github/workflows/auto_release.yaml) will trigger the publish workflow if it detects a new commit in main that is a routine dependency update from renovatebot. Since Renovatebot is configured to auto-merge dependency updates, your package will automatically be published to Nuget when a new version of Godot.NET.Sdk is released or other packages you depend on are updated. If this behavior is undesired, remove the `"automerge": true` property from [`renovate.json`](./renovate.json).
-
-> To publish to nuget, you need to configure a repository or organization secret within GitHub named `NUGET_API_KEY` that contains your Nuget API key. Make sure you setup `NUGET_API_KEY` as a **secret** (rather than an environment variable) to keep it safe!
-
-### 🏚 Renovatebot
-
-This repository includes a [`renovate.json`](./renovate.json) configuration for use with [Renovatebot]. Renovatebot can automatically open and merge pull requests to help you keep your dependencies up to date when it detects new dependency versions have been released.
-
-![Renovatebot Pull Request](docs/renovatebot_pr.png)
-
-> Unlike Dependabot, Renovatebot is able to combine all dependency updates into a single pull request — a must-have for Godot C# repositories where each sub-project needs the same Godot.NET.Sdk versions. If dependency version bumps were split across multiple repositories, the builds would fail in CI.
-
-The easiest way to add Renovatebot to your repository is to [install it from the GitHub Marketplace][get-renovatebot]. Note that you have to grant it access to each organization and repository you want it to monitor.
-
-The included `renovate.json` includes a few configuration options to limit how often Renovatebot can open pull requests as well as regex's to filter out some poorly versioned dependencies to prevent invalid dependency version updates.
-
-If your project is setup to require approvals before pull requests can be merged *and* you wish to take advantage of Renovatebot's auto-merge feature, you can install the [Renovate Approve][renovate-approve] bot to automatically approve the Renovate dependency PR's. If you need two approvals, you can install the identical [Renovate Approve 2][renovate-approve-2] bot. See [this][about-renovate-approvals] for more information.
-
+---
+---
 ---
 
 🐣 Package generated from a 🐤 Chickensoft Template — <https://chickensoft.games>
 
-[chickensoft-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/chickensoft_badge.svg
-[chickensoft-website]: https://chickensoft.games
-[discord-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/discord_badge.svg
-[discord]: https://discord.gg/gSjaPgMmYW
-[read-the-docs-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/read_the_docs_badge.svg
-[docs]: https://chickensoft.games/docsickensoft%20Discord-%237289DA.svg?style=flat&logo=discord&logoColor=white
-[line-coverage]: ExportValidation.Tests/badges/line_coverage.svg
-[branch-coverage]: ExportValidation.Tests/badges/branch_coverage.svg
-
-[GoDotTest]: https://github.com/chickensoft-games/go_dot_test
-[setup-docs]: https://chickensoft.games/docs/setup
-[cspell]: https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
-[Renovatebot]: https://www.mend.io/free-developer-tools/renovate/
-[get-renovatebot]: https://github.com/apps/renovate
-[renovate-approve]: https://github.com/apps/renovate-approve
-[renovate-approve-2]: https://github.com/apps/renovate-approve-2
-[about-renovate-approvals]: https://stackoverflow.com/a/66575885
-[coverlet-issues]: https://github.com/coverlet-coverage/coverlet/issues/1422
+[line-coverage]: ExportsValidation.Tests/badges/line_coverage.svg
+[branch-coverage]: ExportsValidation.Tests/badges/branch_coverage.svg

@@ -5,12 +5,12 @@
   "ignorePaths": [
     "**/*.tscn",
     "**/*.import",
-    "ExportValidation.Tests/badges/**/*.*",
-    "ExportValidation.Tests/coverage/**/*.*",
-    "ExportValidation.Tests/.godot/**/*.*",
+    "ExportsValidation.Tests/badges/**/*.*",
+    "ExportsValidation.Tests/coverage/**/*.*",
+    "ExportsValidation.Tests/.godot/**/*.*",
     "**/obj/**/*.*",
     "**/bin/**/*.*",
-    "ExportValidation/nupkg/**/*.*",
+    "ExportsValidation/nupkg/**/*.*",
     "**/*.svg"
   ],
   "words": [

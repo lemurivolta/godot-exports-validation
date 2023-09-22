@@ -1,7 +1,7 @@
-ExportValidation/nupkg/
+ExportsValidation/nupkg/
 
-ExportValidation.Tests/coverage/*
-!ExportValidation.Tests/coverage/.gdignore
+ExportsValidation.Tests/coverage/*
+!ExportsValidation.Tests/coverage/.gdignore
 
 .godot/
 bin/

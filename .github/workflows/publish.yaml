@@ -38,7 +38,7 @@ jobs:
         uses: KageKirin/get-csproj-version@v1.0.0
         id: current-version
         with:
-          file: ExportValidation/ExportValidation.csproj
+          file: ExportsValidation/ExportsValidation.csproj
           xpath: /Project/PropertyGroup/Version
 
       - name: 🖨 Print Current Version
@@ -60,7 +60,7 @@ jobs:
       - name: 📝 Change Version
         uses: vers-one/dotnet-project-version-updater@v1.3
         with:
-          file: "ExportValidation/ExportValidation.csproj"
+          file: "ExportsValidation/ExportsValidation.csproj"
           version:  ${{ steps.next-version.outputs.version }}
 
       - name: ✍️ Commit Changes
@@ -84,10 +84,10 @@ jobs:
       - name: 📦 Publish
         run: |
           # build the package
-          dotnet build ExportValidation/ExportValidation.csproj -c Release
+          dotnet build ExportsValidation/ExportsValidation.csproj -c Release
 
           # find the built nuget package
-          nuget_package=$(find . -name "ExportValidation.*.nupkg")
+          nuget_package=$(find . -name "ExportsValidation.*.nupkg")
 
           echo "📦 Publishing package: $nuget_package"
 

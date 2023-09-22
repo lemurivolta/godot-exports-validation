@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Godot;
+
 namespace LemuRivolta.ExportsValidation
 {
     [Serializable]
@@ -33,9 +35,9 @@ namespace LemuRivolta.ExportsValidation
         }
 
         private static string GetMessage(IEnumerable<ValidationFailureInfo> info) =>
-            string.Join('\n',
+            "Validation failed:\n" + string.Join('\n',
                 from i in info
-                select $"{i.NodePath}::{i.MemberName} - {i.Message}"
+                select $"  {i.NodePath}::{i.MemberName} - {i.Message}"
             );
     }
 }

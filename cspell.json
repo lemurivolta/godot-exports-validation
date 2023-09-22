@@ -10,7 +10,8 @@
     "ExportValidation.Tests/.godot/**/*.*",
     "**/obj/**/*.*",
     "**/bin/**/*.*",
-    "ExportValidation/nupkg/**/*.*"
+    "ExportValidation/nupkg/**/*.*",
+    "**/*.svg"
   ],
   "words": [
     "assemblyfilters",

@@ -19,28 +19,34 @@ Want to try it out? Quickly get your project to use Exports Validation!
 1. *Install the NuGet package*. You can search for **LemuRivolta.ExportsValidation** using [Visual Studio](https://learn.microsoft.com/en-us/nuget/quickstart/install-and-use-a-package-in-visual-studio#nuget-package-manager), [VSCode](https://code.visualstudio.com/docs/csharp/package-management) or do it on the [command line](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-install).
 2. *Add some validation attributes* to your fields or properties, like this:
   ```csharp
-  [Export, ValidateNonNull]
-  private Path path;
+[Export, ValidateNonNull]
+private Path2D path;
 
-  [Export, ValidateNotEmpty]
-  private string name;
+[Export, ValidateNotEmpty]
+private string name;
 
-  [Export]
-  [ValidatePackedSceneType(typeof(Bullet))]
-  private PackedScene bulletPackedScene;
+[Export]
+[ValidatePackedSceneType(typeof(Bullet))]
+private PackedScene bulletPackedScene;
 
-  [Export]
-  [ValidateRange(Min = 0, MinInclusive = false)]
-  private float speed;
+[Export]
+[ValidateRange(min: 0, minInclusive: false)]
+private float speed;
   ```
 3. Remember to *call Validate*! Typically, you want to do this on _Ready:
   ```csharp
-  public override void _Ready() {
-    // extension method, it required "this."
+public override void _Ready()
+{
+    // extension method, it requires "this."
     this.Validate();
-  }
+}
   ```
-4. **You're done!**
+4. You *may* need to rebuild the project from Visual Studio / using dotnet build. This is only needed the first time.
+4. **You're done!**,
+
+Validation errors will be displayed when nodes are instantiated, and you can see them under Errors => Debugger:
+
+![A screenshot of Godot, showing that one must click under "Debugger" and then "Errors" to see various validation errors](images/errors.png)
 
 # Supported validators
 

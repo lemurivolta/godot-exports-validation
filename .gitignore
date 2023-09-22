@@ -11,3 +11,4 @@ obj/
 .DS_Store
 
 run_act.ps1
+run_publish.ps1

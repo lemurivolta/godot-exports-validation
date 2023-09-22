@@ -63,17 +63,21 @@ jobs:
           file: "ExportsValidation/ExportsValidation.csproj"
           version:  ${{ steps.next-version.outputs.version }}
 
-      - name: ✍️ Commit Changes
-        run: |
-          git config user.name "action@github.com"
-          git config user.email "GitHub Action"
-          git commit -a -m "chore(version): update version to ${{ steps.next-version.outputs.version }}"
-          git push
+      # - name: ✍️ Commit Changes
+      #   run: |
+      #     git config user.name "action@github.com"
+      #     git config user.email "GitHub Action"
+      #     git commit -a -m "chore(version): update version to ${{ steps.next-version.outputs.version }}"
+      #     git push
 
-      - name: ✨ Create Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create --generate-notes "v${{ steps.next-version.outputs.version }}"
+      - name: Install GH
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
 
       - name: 💽 Setup .NET SDK
         uses: actions/setup-dotnet@v3
@@ -87,9 +91,14 @@ jobs:
           dotnet build ExportsValidation/ExportsValidation.csproj -c Release
 
           # find the built nuget package
-          nuget_package=$(find . -name "ExportsValidation.*.nupkg")
+          nuget_package=$(find . -name "LemuRivolta.ExportsValidation.*.nupkg")
 
-          echo "📦 Publishing package: $nuget_package"
+          echo "📦 Publishing package: '$nuget_package'"
 
           # publish the nuget package
           dotnet nuget push "$nuget_package" --api-key "${{ secrets.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
+      - name: ✨ Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create --generate-notes "v${{ steps.next-version.outputs.version }}"

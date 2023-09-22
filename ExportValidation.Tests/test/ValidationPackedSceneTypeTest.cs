@@ -1,5 +1,7 @@
 ﻿namespace ExportValidation.Tests;
 
+using System;
+
 using Chickensoft.GoDotTest;
 
 using ExportValidation.Tests.test;
@@ -9,6 +11,11 @@ using Godot;
 using LemuRivolta.ExportValidation;
 
 using Shouldly;
+
+partial class TestPackedSceneTypeNonPackedScene: Node {
+    [ValidatePackedSceneType(typeof(BaseScript))]
+    public string Value = "";
+}
 
 partial class TestPackedSceneTypeBase : Node
 {
@@ -29,6 +36,46 @@ public class ValidationPackedSceneTypeTest : TestClass
     public ValidationPackedSceneTypeTest(Node testScene) : base(testScene)
     {
         this.testScene = testScene;
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
+    public void CheckNoParameter()
+    {
+        Should.Throw<ArgumentNullException>(
+            () => new ValidatePackedSceneTypeAttribute(null!),
+            "should not allow a null parameter");
+    }
+
+    [Test]
+    public void CheckInvalid()
+    {
+        var testNode = new TestPackedSceneTypeNonPackedScene();
+        testScene.AddChild(testNode);
+        Should.Throw<FullValidationException>(testNode.Validate,
+            "ValidatePackedSceneType should not accept a string value");
+    }
+
+    [Test]
+    public void CheckGDScriptAndOtherProperties()
+    {
+        var testNode = new TestPackedSceneTypeBase();
+        testScene.AddChild(testNode);
+        var gdScene = GD.Load<PackedScene>("res://test/gd_node.tscn");
+        testNode.Scene = gdScene;
+        Should.Throw<FullValidationException>(testNode.Validate,
+            "ValidatePackedSceneType should not find any GD script");
+    }
+
+    [Test]
+    public void CheckEmptyScene()
+    {
+        var testNode = new TestPackedSceneTypeBase();
+        testScene.AddChild(testNode);
+        var emptyScene = GD.Load<PackedScene>("res://test/empty_scene.tscn");
+        testNode.Scene = emptyScene;
+        Should.Throw<FullValidationException>(testNode.Validate,
+            "ValidatePackedSceneType should not accept a scene without type");
     }
 
     [Test]

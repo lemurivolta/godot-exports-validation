@@ -6,52 +6,32 @@ using System.Reflection;
 
 using Godot;
 
-public partial class ValidationInfo
+public abstract class ValidationInfo
 {
-    private readonly MemberInfo memberInfo;
+    private readonly string memberName;
     private readonly Node node;
 
-    public MemberInfo MemberInfo => memberInfo;
+    protected ValidationInfo(MemberInfo memberInfo, Node node)
+    {
+        this.node = node;
+        memberName = memberInfo.Name;
+    }
+
+    public static ValidationInfo Create(MemberInfo memberInfo, Node node) =>
+        memberInfo switch
+        {
+            FieldInfo fieldInfo => new FieldValidationInfo(node, fieldInfo),
+            PropertyInfo propertyInfo => new PropertyValidationInfo(node, propertyInfo),
+            _ => throw new ArgumentException("member info is neither field nor property", nameof(memberInfo))
+        };
+
     public Node Node => node;
 
-    public ValidationInfo(MemberInfo memberInfo, Node node)
-    {
-        this.memberInfo = memberInfo;
-        this.node = node;
-    }
+    public string NodePath => node.GetPath().ToString();
 
-    public object Value => Switch(
-        fieldInfo => fieldInfo.GetValue(Node)!,
-        propertyInfo => propertyInfo.GetValue(Node)!);
+    public string MemberName => memberName;
 
-    public string MemberName => MemberInfo.Name;
+    public abstract object Value { get; }
 
-    public string NodePath => Node.GetPath().ToString();
-
-    public Type MemberType => Switch(
-        fieldInfo => fieldInfo.FieldType,
-        propertyInfo => propertyInfo.PropertyType);
-
-    private T Switch<T>(
-        Func<FieldInfo, T> fieldInfoAction,
-        Func<PropertyInfo, T> propertyInfoAction,
-        Func<MemberInfo, T>? memberInfoAction = null)
-    {
-        static T DefaultMemberInfoAction(MemberInfo memberInfo)
-        {
-            throw new InvalidOperationException();
-        };
-        if (MemberInfo is FieldInfo fieldInfo)
-        {
-            return fieldInfoAction(fieldInfo);
-        }
-        else if (MemberInfo is PropertyInfo propertyInfo)
-        {
-            return propertyInfoAction(propertyInfo);
-        }
-        else
-        {
-            return (memberInfoAction ?? DefaultMemberInfoAction)(MemberInfo);
-        }
-    }
+    public abstract Type MemberType { get; }
 }

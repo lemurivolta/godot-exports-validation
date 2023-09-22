@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://coql60e5tqnx"]
+
+[ext_resource type="Script" path="res://test/MyGDScript.gd" id="1_0cnxe"]
+
+[node name="Node" type="Node"]
+editor_description = "description"
+script = ExtResource("1_0cnxe")
+
+[node name="ChildNode" type="Node" parent="."]
+editor_description = "other"

@@ -17,6 +17,12 @@ partial class TestNodeNotEmpty : Node
     public string? ValueWithWhiteSpace = null;
 }
 
+partial class TestWrongTypeNotEmpty : Node
+{
+    [ValidateNotEmpty]
+    public int Value = 3;
+}
+
 
 internal class ValidationNotEmptyTest : TestClass
 {
@@ -28,13 +34,24 @@ internal class ValidationNotEmptyTest : TestClass
     }
 
     [Test]
+    public void CheckWrongType()
+    {
+        var testNode = new TestWrongTypeNotEmpty();
+        testScene.AddChild(testNode);
+
+        Should.Throw<FullValidationException>(testNode.Validate,
+            "wrong type should fail not-empty test");
+    }
+
+    [Test]
     public void CheckNotEmptyNoWhitespace()
     {
         var testNode = new TestNodeNotEmpty();
         testScene.AddChild(testNode);
 
-        testNode.Value = null;
         testNode.ValueWithWhiteSpace = "hello";
+
+        testNode.Value = null;
         Should.Throw<FullValidationException>(testNode.Validate,
             "null value should fail not-empty test");
 

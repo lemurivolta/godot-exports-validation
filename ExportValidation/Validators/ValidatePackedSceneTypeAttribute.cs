@@ -17,46 +17,45 @@ public class ValidatePackedSceneTypeAttribute : NodeValidationBaseAttribute
             throw new ArgumentNullException(nameof(type), "cannot be null");
     }
 
-    public override ValidationError? Validate(ValidationInfo validationInfo) =>
-        validationInfo.Value is not PackedScene packedScene ?
+    public override ValidationError? Validate(ValidationInfo validationInfo)
+    {
+        return validationInfo.Value is not PackedScene packedScene ?
             new($"can only validate PackedScenes, not {validationInfo.MemberType.Name}") :
         !TryGetPackedSceneType(packedScene, out var packedSceneType) ?
             new("no script attached to the packed scene") :
         !type.IsAssignableFrom(packedSceneType) ?
             new($"Cannot assign a '{packedSceneType.FullName}' to a '{type.FullName}'") :
             null;
+    }
 
     private static bool TryGetPackedSceneType(
         PackedScene packedScene,
         [NotNullWhen(true)] out Type? type)
     {
         var sceneState = packedScene.GetState();
-        for (var i = 0; i < sceneState.GetNodeCount(); i++)
+        var nodePath = sceneState.GetNodePath(0);
+        // consider only root node - should always be the first
+        if (nodePath != ".")
         {
-            var nodePath = sceneState.GetNodePath(i);
-            // consider only root node
-            if (nodePath == ".")
+            throw new InvalidOperationException("root node was not the first");
+        }
+        for (var i = 0; i < sceneState.GetNodePropertyCount(0); i++)
+        {
+            var propertyName = sceneState.GetNodePropertyName(0, i);
+            // consider only the "script" property
+            if (propertyName != "script")
             {
-                for (var j = 0; j < sceneState.GetNodePropertyCount(i); j++)
-                {
-                    var propertyName = sceneState.GetNodePropertyName(i, j);
-                    // consider only the "script" property
-                    if (propertyName != "script")
-                    {
-                        continue;
-                    }
-                    // extract the script and compare the types
-                    Variant propertyValue = sceneState.GetNodePropertyValue(i, j);
-                    var godotObject = propertyValue.AsGodotObject();
-                    if (godotObject is CSharpScript cSharpScript)
-                    {
-                        var instance = cSharpScript.New();
-                        var go = instance.AsGodotObject();
-                        type = go.GetType();
-                        return true;
-                    }
-                }
-                break;
+                continue;
+            }
+            // extract the script and compare the types
+            Variant propertyValue = sceneState.GetNodePropertyValue(0, i);
+            var godotObject = propertyValue.AsGodotObject();
+            if (godotObject is CSharpScript cSharpScript)
+            {
+                var instance = cSharpScript.New();
+                var go = instance.AsGodotObject();
+                type = go.GetType();
+                return true;
             }
         }
         type = null;

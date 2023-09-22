@@ -1,6 +1,7 @@
 namespace LemuRivolta.ExportValidation;
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using Godot;
@@ -8,15 +9,15 @@ using Godot;
 public static class NodeValidation
 {
     public static void Validate(this Node node)
-    { 
+    {
         List<ValidationFailureInfo> info = new();
-        foreach (FieldInfo field in node.GetType().GetFields(BindingFlags.Public |
-            BindingFlags.NonPublic |
-            BindingFlags.Instance))
+        var allMembers = ((MemberInfo[])node.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            .Concat(node.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+        foreach (MemberInfo member in allMembers)
         {
-            foreach (var attribute in field.GetCustomAttributes<NodeValidationBaseAttribute>())
+            foreach (var attribute in member.GetCustomAttributes<NodeValidationBaseAttribute>())
             {
-                ValidationInfo validationInfo = new(field, node);
+                var validationInfo = ValidationInfo.Create(member, node);
                 var validationError = attribute.Validate(validationInfo);
                 if (validationError != null)
                 {

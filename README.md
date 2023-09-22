@@ -33,7 +33,7 @@ Want to try it out? Quickly get your project to use Exports Validation!
   [ValidateRange(Min = 0, MinInclusive = false)]
   private float speed;
   ```
-3. Remember to *call Validate*! Tipically, you want to do this on _Ready:
+3. Remember to *call Validate*! Typically, you want to do this on _Ready:
   ```csharp
   public override void _Ready() {
     // extension method, it required "this."
@@ -56,7 +56,7 @@ This validator checks that the field (or property) is **not null**. It takes no 
 
 This validator checks that a **`string` is not empty**.
 
-By default, strings only made of whitespaces are considered empty too. You can pass `NoWhiteSpace = false` as a property to the attribute to disable this behaviour.
+By default, strings only made of white spaces are considered empty too. You can pass `NoWhiteSpace = false` as a property to the attribute to disable this behavior.
 
 E.g.:
 

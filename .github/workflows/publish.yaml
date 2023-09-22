@@ -63,12 +63,12 @@ jobs:
           file: "ExportsValidation/ExportsValidation.csproj"
           version:  ${{ steps.next-version.outputs.version }}
 
-      # - name: ✍️ Commit Changes
-      #   run: |
-      #     git config user.name "action@github.com"
-      #     git config user.email "GitHub Action"
-      #     git commit -a -m "chore(version): update version to ${{ steps.next-version.outputs.version }}"
-      #     git push
+      - name: ✍️ Commit Changes
+        run: |
+          git config user.name "action@github.com"
+          git config user.email "GitHub Action"
+          git commit -a -m "chore(version): update version to ${{ steps.next-version.outputs.version }}"
+          git push
 
       # - name: Install GH
       #   run: |

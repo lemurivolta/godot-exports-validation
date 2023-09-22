@@ -1,5 +1,7 @@
 ﻿namespace ExportsValidation.Tests;
 
+using System.Linq;
+
 using Chickensoft.GoDotTest;
 
 using Godot;
@@ -29,8 +31,10 @@ public class ValidationNonNullTest : TestClass
         var testNode = new TestNodeNonNull();
         testScene.AddChild(testNode);
 
-        Should.Throw<FullValidationException>(() => testNode.Validate(),
+        var exc = Should.Throw<FullValidationException>(testNode.Validate,
             "null value should fail non-null test");
+        exc!.ValidationFailureInfo.Count().ShouldBe(1);
+        exc!.Message.Split('\n').Length.ShouldBe(2);
 
         testNode.Node = testNode;
         Should.NotThrow(testNode.Validate,

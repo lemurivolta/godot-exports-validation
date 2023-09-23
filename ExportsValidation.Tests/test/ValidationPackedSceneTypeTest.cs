@@ -55,7 +55,7 @@ public class ValidationPackedSceneTypeTest : TestClass
             "should not allow a null parameter");
         Should.Throw<ArgumentException>(
             () => new ValidatePackedSceneTypeAttribute(typeof(int)),
-            "should not allow a type that's not a noed");
+            "should not allow a type that's not a node");
     }
 
     [Test]

@@ -57,7 +57,7 @@ public static class ShouldExtension
                 y is null ? 1 : x.GetHashCode().CompareTo(y.GetHashCode());
     }
 
-    private static readonly TypeComparer typeComparerer;
+    private static readonly TypeComparer typeComparer;
 
     public static void ShouldThrowValidationErrors(this Node node,
         Type[] types, string? customMessage)
@@ -69,8 +69,8 @@ public static class ShouldExtension
             var returnedTypes = (
                 from info in fullValidationException.ValidationFailureInfo
                 select info.ValidationError.GetType())
-                .OrderBy(type => type, typeComparerer);
-            Array.Sort(types, typeComparerer);
+                .OrderBy(type => type, typeComparer);
+            Array.Sort(types, typeComparer);
             returnedTypes.ShouldBe(types);
         }
         else

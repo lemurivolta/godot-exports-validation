@@ -55,26 +55,36 @@ mkdir -p ./badges
 mv ./coverage/report/badge_branchcoverage.svg ./badges/branch_coverage.svg
 mv ./coverage/report/badge_linecoverage.svg ./badges/line_coverage.svg
 
-# Determine OS, open coverage accordingly.
+open=${open:0}
 
-case "$(uname -s)" in
+if [ "$open" = "1" ] ; then
 
-   Darwin)
-     echo 'Mac OS X'
-     open coverage/report/index.htm
-     ;;
+  # Determine OS, open coverage accordingly.
 
-   Linux)
-     echo 'Linux'
-     open coverage/report/index.htm
-     ;;
+  case "$(uname -s)" in
 
-   CYGWIN*|MINGW32*|MSYS*|MINGW*)
-     echo 'MS Windows'
-     start coverage/report/index.htm
-     ;;
+     Darwin)
+       echo 'Mac OS X'
+       open coverage/report/index.htm
+       ;;
 
-   *)
-     echo 'Other OS'
-     ;;
-esac
+     Linux)
+       echo 'Linux'
+       open coverage/report/index.htm
+       ;;
+
+     CYGWIN*|MINGW32*|MSYS*|MINGW*)
+       echo 'MS Windows'
+       start coverage/report/index.htm
+       ;;
+
+    *)
+      echo 'Other OS'
+      ;;
+  esac
+
+else
+
+  echo 'environment variable "open" not set to 1, so we do not open the browser'
+
+fi

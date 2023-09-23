@@ -72,7 +72,7 @@ public class ValidateMinMaxTests: TestClass
         var testNode2 = new TestWrongTypeMinMaxNode();
         testScene.AddChild(testNode2);
 
-        testNode2.ShouldThrowValidationErrors<WrongTypeValidationError>(
+        testNode2.ShouldThrowValidationErrors<WrongTypeValidationError, WrongTypeValidationError>(
             "types other than int, float, decimal and double should not be supported");
     }
 

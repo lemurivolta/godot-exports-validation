@@ -19,7 +19,7 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
 
     public override ValidationError? Validate(ValidationInfo validationInfo)
     {
-        var memberType = validationInfo.MemberType;
+        Type memberType = validationInfo.MemberType;
         if (!memberType.IsAssignableTo(typeof(float)) &&
             !memberType.IsAssignableTo(typeof(double)) &&
             !memberType.IsAssignableTo(typeof(int)) &&
@@ -47,8 +47,8 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
 
     internal class WrongTypeValidationError : ValidationError
     {
-        public WrongTypeValidationError(Type? type) :
-            base($"Can check range only of float, double int and decimals, not of {(type == null ? "<null type>" : type.Name)}")
+        public WrongTypeValidationError(Type type) :
+            base($"Can check range only of float, double int and decimals, not of {type.Name}")
         { }
     }
 

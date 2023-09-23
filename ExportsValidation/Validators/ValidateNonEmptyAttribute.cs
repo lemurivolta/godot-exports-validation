@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public partial class ValidateNotEmptyAttribute : NodeValidationBaseAttribute
+public partial class ValidateNonEmptyAttribute : NodeValidationBaseAttribute
 {
     public bool NoWhiteSpace { get; set; } = true;
 
@@ -22,22 +22,16 @@ public partial class ValidateNotEmptyAttribute : NodeValidationBaseAttribute
 
     internal class MustBeStringValidationError : ValidationError
     {
-        public MustBeStringValidationError() : base("must be a string")
-        {
-        }
+        public MustBeStringValidationError() : base("must be a string") { }
     }
 
     internal class CannotBeEmptyValidationError : ValidationError
     {
-        public CannotBeEmptyValidationError() : base("cannot be empty")
-        {
-        }
+        public CannotBeEmptyValidationError() : base("cannot be empty") { }
     }
 
     internal class CannotBeWhitespaceValidationError : ValidationError
     {
-        public CannotBeWhitespaceValidationError() : base("cannot be only white spaces")
-        {
-        }
+        public CannotBeWhitespaceValidationError() : base("cannot be only white spaces") { }
     }
 }

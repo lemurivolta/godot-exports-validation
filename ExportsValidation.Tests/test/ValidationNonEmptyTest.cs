@@ -6,31 +6,31 @@ using LemuRivolta.ExportsValidation;
 
 using Shouldly;
 
-using static LemuRivolta.ExportsValidation.ValidateNotEmptyAttribute;
+using static LemuRivolta.ExportsValidation.ValidateNonEmptyAttribute;
 
 namespace ExportsValidation.Tests;
 
-partial class TestNodeNotEmpty : Node
+partial class TestNodeNonEmpty : Node
 {
-    [ValidateNotEmpty]
+    [ValidateNonEmpty]
     public string? Value = null;
 
-    [ValidateNotEmpty(NoWhiteSpace = false)]
+    [ValidateNonEmpty(NoWhiteSpace = false)]
     public string? ValueWithWhiteSpace = null;
 }
 
-partial class TestWrongTypeNotEmpty : Node
+partial class TestWrongTypeNonEmpty : Node
 {
-    [ValidateNotEmpty]
+    [ValidateNonEmpty]
     public int Value = 3;
 }
 
 
-internal class ValidationNotEmptyTest : TestClass
+internal class ValidationNonEmptyTest : TestClass
 {
     private readonly Node testScene;
 
-    public ValidationNotEmptyTest(Node testScene) : base(testScene)
+    public ValidationNonEmptyTest(Node testScene) : base(testScene)
     {
         this.testScene = testScene;
     }
@@ -38,7 +38,7 @@ internal class ValidationNotEmptyTest : TestClass
     [Test]
     public void CheckWrongType()
     {
-        var testNode = new TestWrongTypeNotEmpty();
+        var testNode = new TestWrongTypeNonEmpty();
         testScene.AddChild(testNode);
 
         testNode.ShouldThrowValidationErrors<MustBeStringValidationError>(
@@ -46,9 +46,9 @@ internal class ValidationNotEmptyTest : TestClass
     }
 
     [Test]
-    public void CheckNotEmptyNoWhitespace()
+    public void CheckNonEmptyNoWhitespace()
     {
-        var testNode = new TestNodeNotEmpty();
+        var testNode = new TestNodeNonEmpty();
         testScene.AddChild(testNode);
 
         testNode.ValueWithWhiteSpace = "hello";
@@ -70,9 +70,9 @@ internal class ValidationNotEmptyTest : TestClass
             "\"hello\" value should succeed not-empty test");
     }
 
-    public void CheckNotEmptyWhitespace()
+    public void CheckNonEmptyWhitespace()
     {
-        var testNode = new TestNodeNotEmpty();
+        var testNode = new TestNodeNonEmpty();
         testScene.AddChild(testNode);
 
         testNode.Value = "hello";

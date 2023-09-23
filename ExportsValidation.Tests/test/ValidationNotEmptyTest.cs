@@ -6,6 +6,8 @@ using LemuRivolta.ExportsValidation;
 
 using Shouldly;
 
+using static LemuRivolta.ExportsValidation.ValidateNotEmptyAttribute;
+
 namespace ExportsValidation.Tests;
 
 partial class TestNodeNotEmpty : Node
@@ -39,7 +41,7 @@ internal class ValidationNotEmptyTest : TestClass
         var testNode = new TestWrongTypeNotEmpty();
         testScene.AddChild(testNode);
 
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors<MustBeStringValidationError>(
             "wrong type should fail not-empty test");
     }
 
@@ -52,15 +54,15 @@ internal class ValidationNotEmptyTest : TestClass
         testNode.ValueWithWhiteSpace = "hello";
 
         testNode.Value = null;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors<CannotBeNullValidationError>(
             "null value should fail not-empty test");
 
         testNode.Value = "";
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors<CannotBeEmptyValidationError>(
             "empty string value should fail not-empty test");
 
         testNode.Value = "  \t\n";
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors<CannotBeWhitespaceValidationError>(
             "only-whitespace string value should fail not-empty test");
 
         testNode.Value = "hello";
@@ -75,11 +77,11 @@ internal class ValidationNotEmptyTest : TestClass
 
         testNode.Value = "hello";
         testNode.ValueWithWhiteSpace = null;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors<CannotBeNullValidationError>(
             "null value should fail not-empty test");
 
         testNode.ValueWithWhiteSpace = "";
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors<CannotBeEmptyValidationError>(
             "empty string value should fail not-empty test");
 
         testNode.ValueWithWhiteSpace = "  \t\n";

@@ -9,10 +9,35 @@ public partial class ValidateNotEmptyAttribute : NodeValidationBaseAttribute
     public bool NoWhiteSpace { get; set; } = true;
 
     public override ValidationError? Validate(ValidationInfo validationInfo) =>
-        validationInfo.Value == null ? new("is null") :
-        validationInfo.Value is not string s ? new("can only check strings") :
-        string.IsNullOrEmpty(s) ? new("is empty") :
-        (NoWhiteSpace && string.IsNullOrWhiteSpace(s)) ? new("is whitespace") :
+        validationInfo.Value == null ? new CannotBeNullValidationError() :
+        validationInfo.Value is not string s ? new MustBeStringValidationError() :
+        string.IsNullOrEmpty(s) ? new CannotBeEmptyValidationError() :
+        (NoWhiteSpace && string.IsNullOrWhiteSpace(s)) ? new CannotBeWhitespaceValidationError() :
         null;
 
+    internal class CannotBeNullValidationError : ValidationError
+    {
+        public CannotBeNullValidationError() : base("cannot be null") { }
+    }
+
+    internal class MustBeStringValidationError : ValidationError
+    {
+        public MustBeStringValidationError() : base("must be a string")
+        {
+        }
+    }
+
+    internal class CannotBeEmptyValidationError : ValidationError
+    {
+        public CannotBeEmptyValidationError() : base("cannot be empty")
+        {
+        }
+    }
+
+    internal class CannotBeWhitespaceValidationError : ValidationError
+    {
+        public CannotBeWhitespaceValidationError() : base("cannot be only white spaces")
+        {
+        }
+    }
 }

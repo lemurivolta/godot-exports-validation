@@ -10,6 +10,8 @@ using LemuRivolta.ExportsValidation;
 
 using Shouldly;
 
+using static LemuRivolta.ExportsValidation.ValidateNonNullAttribute;
+
 partial class TestNodeNonNull : Node
 {
     [ValidateNonNull]
@@ -31,9 +33,8 @@ public class ValidationNonNullTest : TestClass
         var testNode = new TestNodeNonNull();
         testScene.AddChild(testNode);
 
-        var exc = Should.Throw<FullValidationException>(testNode.Validate,
+        var exc = testNode.ShouldThrowValidationErrors<CannotBeNullValidationError>(
             "null value should fail non-null test");
-        exc!.ValidationFailureInfo.Count().ShouldBe(1);
         exc!.Message.Split('\n').Length.ShouldBe(2);
 
         testNode.Node = testNode;

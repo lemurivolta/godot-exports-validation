@@ -7,5 +7,10 @@ using System.Collections.Generic;
 public class ValidateNonNullAttribute : NodeValidationBaseAttribute
 {
     public override ValidationError? Validate(ValidationInfo validationInfo) =>
-        validationInfo.Value == null ? new("cannot be null") : null;
+        validationInfo.Value == null ? new CannotBeNullValidationError() : null;
+
+    internal class CannotBeNullValidationError : ValidationError
+    {
+        public CannotBeNullValidationError() : base("cannot be null") { }
+    }
 }

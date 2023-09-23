@@ -12,6 +12,8 @@ using LemuRivolta.ExportsValidation;
 
 using Shouldly;
 
+using static LemuRivolta.ExportsValidation.ValidatePackedSceneTypeAttribute;
+
 partial class TestPackedSceneTypeNonPackedScene: Node {
     [ValidatePackedSceneType(typeof(BaseScript))]
     public string Value = "";
@@ -20,6 +22,12 @@ partial class TestPackedSceneTypeNonPackedScene: Node {
 partial class TestPackedSceneTypeBase : Node
 {
     [ValidatePackedSceneType(typeof(BaseScript))]
+    public PackedScene? Scene = null;
+}
+
+partial class TestPackedSceneTypeBaseNullable : Node
+{
+    [ValidatePackedSceneType(typeof(BaseScript), AllowNullValues = true)]
     public PackedScene? Scene = null;
 }
 
@@ -45,6 +53,9 @@ public class ValidationPackedSceneTypeTest : TestClass
         Should.Throw<ArgumentNullException>(
             () => new ValidatePackedSceneTypeAttribute(null!),
             "should not allow a null parameter");
+        Should.Throw<ArgumentException>(
+            () => new ValidatePackedSceneTypeAttribute(typeof(int)),
+            "should not allow a type that's not a noed");
     }
 
     [Test]
@@ -52,8 +63,23 @@ public class ValidationPackedSceneTypeTest : TestClass
     {
         var testNode = new TestPackedSceneTypeNonPackedScene();
         testScene.AddChild(testNode);
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors
+            <CanOnlyValidatePackedScenesValidationError>(
             "ValidatePackedSceneType should not accept a string value");
+    }
+
+    [Test]
+    public void CheckNull()
+    {
+        var testNode = new TestPackedSceneTypeBase();
+        testScene.AddChild(testNode);
+        testNode.ShouldThrowValidationErrors
+            <CannotBeNullValidationError>(
+            "by default packed scenes cannot be null");
+
+        var testNode2 = new TestPackedSceneTypeBaseNullable();
+        testScene.AddChild(testNode2);
+        Should.NotThrow(testNode2.Validate, "can be allowed null packed scenes");
     }
 
     [Test]
@@ -63,7 +89,8 @@ public class ValidationPackedSceneTypeTest : TestClass
         testScene.AddChild(testNode);
         var gdScene = GD.Load<PackedScene>("res://test/gd_node.tscn");
         testNode.Scene = gdScene;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors
+            <NoScriptAttachedValidationError>(
             "ValidatePackedSceneType should not find any GD script");
     }
 
@@ -74,7 +101,8 @@ public class ValidationPackedSceneTypeTest : TestClass
         testScene.AddChild(testNode);
         var emptyScene = GD.Load<PackedScene>("res://test/empty_scene.tscn");
         testNode.Scene = emptyScene;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors
+            <NoScriptAttachedValidationError>(
             "ValidatePackedSceneType should not accept a scene without type");
     }
 
@@ -97,7 +125,8 @@ public class ValidationPackedSceneTypeTest : TestClass
             "assigning a script derived from the requested type should work");
 
         testNode.Scene = unrelatedScene;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors
+            <NotAssignableValidationError>(
             "assigning a script unrelated to the requested type should throw");
     }
 
@@ -112,7 +141,8 @@ public class ValidationPackedSceneTypeTest : TestClass
         var unrelatedScene = GD.Load<PackedScene>("res://test/unrelated_node.tscn");
 
         testNode.Scene = baseScene;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors
+            <NotAssignableValidationError>(
             "assigning a script higher in the derivation hierarchy should not work");
 
         testNode.Scene = derivedScene;
@@ -120,7 +150,8 @@ public class ValidationPackedSceneTypeTest : TestClass
             "assigning a script derived from the requested type should work");
 
         testNode.Scene = unrelatedScene;
-        Should.Throw<FullValidationException>(testNode.Validate,
+        testNode.ShouldThrowValidationErrors
+            <NotAssignableValidationError>(
             "assigning a script unrelated to the requested type should throw");
     }
 }

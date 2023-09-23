@@ -8,10 +8,15 @@ using Godot;
 
 namespace LemuRivolta.ExportsValidation
 {
-    [Serializable]
-    public record ValidationFailureInfo(
-            string NodePath, string MemberName, string Message);
+    public record ValidationFailureInfo(ValidationInfo ValidationInfo,
+        ValidationError ValidationError)
+    {
+        public string NodePath => ValidationInfo.NodePath;
+        public string MemberName => ValidationInfo.MemberName;
+        public string Message => ValidationError.Message;
+    }
 
+    [Serializable]
     public class FullValidationException : Exception
     {
         private readonly IEnumerable<ValidationFailureInfo> validationFailureInfo;

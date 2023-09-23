@@ -25,10 +25,7 @@ public static class NodeValidation
             from attribute in member.GetCustomAttributes<NodeValidationBaseAttribute>()
             let validationError = attribute.Validate(validationInfo)
             where validationError != null
-            select new ValidationFailureInfo(
-                validationInfo.NodePath,
-                validationInfo.MemberName,
-                validationError.Message)
+            select new ValidationFailureInfo(validationInfo, validationError)
             ).ToList();
 
         if (info.Count > 0)

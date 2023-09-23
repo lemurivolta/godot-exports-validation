@@ -55,4 +55,8 @@
   <ItemGroup>
     <None Update="icon.png" Pack="true" />
   </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="ExportsValidation.Tests"/>
+	</ItemGroup>
 </Project>

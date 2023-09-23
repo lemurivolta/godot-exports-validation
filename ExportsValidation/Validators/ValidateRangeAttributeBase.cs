@@ -26,7 +26,7 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
             !memberType.IsAssignableTo(typeof(decimal))
             )
         {
-            return WrongTypeValidationError(memberType);
+            return new WrongTypeValidationError(memberType);
         }
 
         var value = ToDouble(validationInfo.Value);

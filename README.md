@@ -22,16 +22,15 @@ Want to try it out? Quickly get your project to use Exports Validation!
 [Export, ValidateNonNull]
 private Path2D path;
 
-[Export, ValidateNotEmpty]
+[Export, ValidateNonEmpty]
 private string name;
+
+[Export, ValidateMin(0, Inclusive = false)]
+private float speed;
 
 [Export]
 [ValidatePackedSceneType(typeof(Bullet))]
 private PackedScene bulletPackedScene;
-
-[Export]
-[ValidateRange(min: 0, minInclusive: false)]
-private float speed;
   ```
 3. Remember to *call Validate*! Typically, you want to do this on _Ready:
   ```csharp
@@ -50,74 +49,97 @@ Validation errors will be displayed when nodes are instantiated, and you can see
 
 # Supported validators
 
-All validators are expressed as attributes, and work on both properties and on fields.
+All validators are expressed as attributes, and work on both properties and fields.
 
 Here is the list of the currently available validators.
 
 ## `ValidateNonNull`
 
-This validator checks that the field (or property) is **not null**. It takes no arguments and has no properties.
+This validator checks that the field (or property) is **not null**.
 
-## `ValidateNotEmpty`
+## `ValidateNonEmpty`
 
-This validator checks that a **`string` is not empty**.
+This validator checks that a string member **is not empty**.
 
 By default, strings only made of white spaces are considered empty too. You can pass `NoWhiteSpace = false` as a property to the attribute to disable this behavior.
 
 E.g.:
 
 ```csharp
-[ValidateNotEmpty]
-public string? Value = "hello";
+// valid
+[ValidateNonEmpty]
+public string Value = "hello";
 
-[ValidateNotEmpty(NoWhiteSpace = false)]
-public string? ValueThatAcceptsWhiteSpaces =
-  "   ";
+// fails validation
+[ValidateNonEmpty]
+public string ValueOnlyWhiteSpaces = "   ";
+
+// valid
+[ValidateNonEmpty(NoWhiteSpace = false)]
+public string? ValueThatAcceptsWhiteSpaces = "   ";
+
+// fails validation
+[ValidateNonEmpty]
+public string ValueEmpty = "";
+
+// fails validation
+[ValidateNonEmpty]
+public string ValueNull = null;
 ```
 
-## `ValidateRange`
+## `ValidateMin` and `ValidateMax`
 
-This validator checks that a **numeric field (or property) is within a given range**.
+These validators checks that a **numeric field (or property) is greater or lesser than a value**. The value to check against (minimum or maximum) is passed as a parameter to the attribute.
 
-Ranges are expressed using arguments `min` and `max`. You can pass just min or just max, if the other end of the range must not be checked.
+`[ValidateMin(min)]` can be used to check that a value is _at least_ a certain amount, and `[ValidateMax(max)]` to check that is _at most_ it. Using them together allows to check for a value to be in a certain range.
 
-By default, all ranges are inclusive. The `minInclusive` and `maxInclusive` arguments are flags that can be set to `false` so that the respective extreme is not considered valid for the range.
+By default, both attributes interpret the range as inclusive (the parameter is a valid value for the member). The parameter `Inclusive = false` can be passed to make that part of the range exclusive.
 
-Supported numeric types are `int`, `float`, `double` and `decimal`.
+Numeric types that are supported for the check are `int`, `float`, `double` and `decimal`.
 
 E.g.:
 
 ```csharp
-[ValidateRange(min: 0)]
+[ValidateMin(0)]
 public int ValueRangeMinInclusive0 = 0;
 
-[ValidateRange(min: 0, minInclusive: false)]
-public float ValueRangeMinExclusive0 = 1;
+[ValidateMin(0, Inclusive = false)]
+public int ValueRangeMinExclusive0 { get; set; } = 10;
 
-[ValidateRange(max: 10)]
-public double ValueRangeMaxInclusive0 = 10;
+[ValidateMax(0)]
+public int ValueRangeMaxInclusive0 = 0;
 
-[ValidateRange(max: 10, maxInclusive: false)]
-public decimal ValueRangeMaxExclusive0 = 9;
+[ValidateMax(0, Inclusive = false)]
+public int ValueRangeMaxExclusive0 { get; set; } = -10;
 
-[ValidateRange(min: 0, max: 10, maxInclusive: false)]
+// valid values are between 0 and 10; 0 is valid and 10 is not.
+[ValidateMin(0), ValidateMax(10, Inclusive = false)]
 public int ValueRangeMinInclusive0MaxExclusive0 = 5;
 ```
 
 ## `ValidatePackedSceneType`
 
-This validator checks that a **PackedScene field (or property) points to a scene that is of the given type**. The type is passed as its only argument.
+This validator checks that a **PackedScene field (or property) points to a scene that is of the given type**. The type is its parameter.
 
 E.g.:
 
 ```csharp
 [ValidatePackedSceneType(typeof(PuzzlePiece))]
-public PackedScene? PuzzlePieceScene = null;
+public PackedScene PuzzlePieceScene = null;
 ```
 
 The check `[ValidatePackedSceneType(typeof(MyScript))]` is satisfied if the root node of the PackedScene has a C# script attached to it of type `MyScript`, or of a type derived from `MyScript`.
 
 In other words, instances of the packed scene must be assignable to variables ot type `MyScript`.
+
+By default, the `null` value is not valid. If the `null` value is valid, add `AllowNullValues = true` as a parameter to the attribute. E.g.:
+
+```csharp
+[ValidatePackedSceneType(
+    typeof(PuzzlePiece),
+    AllowNullValues = true)]
+public PackedScene PuzzlePieceScene = null;
+```
 
 ---
 ---

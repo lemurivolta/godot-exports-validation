@@ -95,7 +95,7 @@ public class ValidateMinMaxTests: TestClass
 
         testNode.ValueRangeMinInclusive0 = -10;
         CheckFailure(
-            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 inclusive fails on -10"),
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationInclusiveError>("0 inclusive fails on -10"),
             nameof(TestMinMaxNode.ValueRangeMinInclusive0));
 
         testNode.ValueRangeMinInclusive0 = 10;
@@ -118,7 +118,7 @@ public class ValidateMinMaxTests: TestClass
 
         testNode.ValueRangeMinExclusive0 = -10;
         CheckFailure(
-            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on -10"),
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationExclusiveError>("0 exclusive fails on -10"),
             nameof(TestMinMaxNode.ValueRangeMinExclusive0));
 
         testNode.ValueRangeMinExclusive0 = 10;
@@ -126,7 +126,7 @@ public class ValidateMinMaxTests: TestClass
 
         testNode.ValueRangeMinExclusive0 = 0;
         CheckFailure(
-            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on 0"),
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationExclusiveError>("0 exclusive fails on 0"),
             nameof(TestMinMaxNode.ValueRangeMinExclusive0));
     }
 
@@ -143,7 +143,7 @@ public class ValidateMinMaxTests: TestClass
 
         testNode.ValueRangeMaxInclusive0 = 10;
         CheckFailure(
-            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 inclusive fails on 10"),
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationInclusiveError>("0 inclusive fails on 10"),
             nameof(TestMinMaxNode.ValueRangeMaxInclusive0));
 
         testNode.ValueRangeMaxInclusive0 = -10;
@@ -166,7 +166,7 @@ public class ValidateMinMaxTests: TestClass
 
         testNode.ValueRangeMaxExclusive0 = 10;
         CheckFailure(
-            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on 10"),
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationExclusiveError>("0 exclusive fails on 10"),
             nameof(TestMinMaxNode.ValueRangeMaxExclusive0));
 
         testNode.ValueRangeMaxExclusive0 = -10;
@@ -174,7 +174,7 @@ public class ValidateMinMaxTests: TestClass
 
         testNode.ValueRangeMaxExclusive0 = 0;
         CheckFailure(
-            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on 0"),
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationExclusiveError>("0 exclusive fails on 0"),
             nameof(TestMinMaxNode.ValueRangeMaxExclusive0));
     }
 }

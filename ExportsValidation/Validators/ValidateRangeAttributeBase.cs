@@ -30,10 +30,11 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
         }
 
         var value = ToDouble(validationInfo.Value);
-        return Inclusive && multiplier * value < multiplier * min ||
-            !Inclusive && multiplier * value <= multiplier * min
-            ? new OutsideRangeValidationError(comparative, min)
-            : (ValidationError?)null;
+        return Inclusive && multiplier * value < multiplier * min ?
+            new OutsideRangeValidationInclusiveError(comparative, min) :
+            !Inclusive && multiplier * value <= multiplier * min ?
+            new OutsideRangeValidationExclusiveError(comparative, min) :
+            null;
     }
 
     private static double ToDouble(object value) => value switch
@@ -52,9 +53,16 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
         { }
     }
 
-    internal class OutsideRangeValidationError : ValidationError
+    internal class OutsideRangeValidationExclusiveError : ValidationError
     {
-        public OutsideRangeValidationError(string comparative, double extreme) :
+        public OutsideRangeValidationExclusiveError(string comparative, double extreme) :
+            base($"must be {comparative} than {extreme}")
+        { }
+    }
+
+    internal class OutsideRangeValidationInclusiveError : ValidationError
+    {
+        public OutsideRangeValidationInclusiveError(string comparative, double extreme) :
             base($"must be {comparative} or equal than {extreme}")
         { }
     }

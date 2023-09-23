@@ -8,26 +8,28 @@ using Godot;
 
 public static class NodeValidation
 {
+    /// <summary>
+    /// Binding flags used to retrieve fields and properties we're looking for
+    /// </summary>
+    private const BindingFlags bindingFlags =
+        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
     public static void Validate(this Node node)
     {
-        List<ValidationFailureInfo> info = new();
-        var allMembers = ((MemberInfo[])node.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            .Concat(node.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
-        foreach (MemberInfo member in allMembers)
-        {
-            foreach (var attribute in member.GetCustomAttributes<NodeValidationBaseAttribute>())
-            {
-                var validationInfo = ValidationInfo.Create(member, node);
-                var validationError = attribute.Validate(validationInfo);
-                if (validationError != null)
-                {
-                    info.Add(new(
-                        validationInfo.NodePath,
-                        validationInfo.MemberName,
-                        validationError.Message));
-                }
-            }
-        }
+        var allMembers = ((MemberInfo[])node.GetType().GetFields(bindingFlags))
+            .Concat(node.GetType().GetProperties(bindingFlags));
+
+        var info = (
+            from member in allMembers
+            let validationInfo = ValidationInfo.Create(member, node)
+            from attribute in member.GetCustomAttributes<NodeValidationBaseAttribute>()
+            let validationError = attribute.Validate(validationInfo)
+            where validationError != null
+            select new ValidationFailureInfo(
+                validationInfo.NodePath,
+                validationInfo.MemberName,
+                validationError.Message)
+            ).ToList();
 
         if (info.Count > 0)
         {

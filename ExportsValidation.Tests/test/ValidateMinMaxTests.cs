@@ -10,6 +10,8 @@ using LemuRivolta.ExportsValidation;
 
 using Shouldly;
 
+using static LemuRivolta.ExportsValidation.ValidateRangeAttributeBase;
+
 partial class TestMinMaxNode : Node
 {
     [ValidateMin(0)]
@@ -70,7 +72,7 @@ public class ValidateMinMaxTests: TestClass
         var testNode2 = new TestWrongTypeMinMaxNode();
         testScene.AddChild(testNode2);
 
-        Should.Throw<FullValidationException>(testNode2.Validate,
+        testNode2.ShouldThrowValidationErrors<WrongTypeValidationError>(
             "types other than int, float, decimal and double should not be supported");
     }
 
@@ -92,8 +94,8 @@ public class ValidateMinMaxTests: TestClass
         testScene.AddChild(testNode);
 
         testNode.ValueRangeMinInclusive0 = -10;
-        CheckFailure(Should.Throw<FullValidationException>(testNode.Validate,
-            "0 inclusive fails on -10"),
+        CheckFailure(
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 inclusive fails on -10"),
             nameof(TestMinMaxNode.ValueRangeMinInclusive0));
 
         testNode.ValueRangeMinInclusive0 = 10;
@@ -115,16 +117,16 @@ public class ValidateMinMaxTests: TestClass
         testScene.AddChild(testNode);
 
         testNode.ValueRangeMinExclusive0 = -10;
-        CheckFailure(Should.Throw<FullValidationException>(testNode.Validate,
-            "0 exclusive fails on -10"),
+        CheckFailure(
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on -10"),
             nameof(TestMinMaxNode.ValueRangeMinExclusive0));
 
         testNode.ValueRangeMinExclusive0 = 10;
         Should.NotThrow(testNode.Validate, "0 exclusive succeeds on 10");
 
         testNode.ValueRangeMinExclusive0 = 0;
-        CheckFailure(Should.Throw<FullValidationException>(testNode.Validate,
-            "0 exclusive fails on 0"),
+        CheckFailure(
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on 0"),
             nameof(TestMinMaxNode.ValueRangeMinExclusive0));
     }
 
@@ -140,8 +142,8 @@ public class ValidateMinMaxTests: TestClass
         testScene.AddChild(testNode);
 
         testNode.ValueRangeMaxInclusive0 = 10;
-        CheckFailure(Should.Throw<FullValidationException>(testNode.Validate,
-            "0 inclusive fails on 10"),
+        CheckFailure(
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 inclusive fails on 10"),
             nameof(TestMinMaxNode.ValueRangeMaxInclusive0));
 
         testNode.ValueRangeMaxInclusive0 = -10;
@@ -163,16 +165,16 @@ public class ValidateMinMaxTests: TestClass
         testScene.AddChild(testNode);
 
         testNode.ValueRangeMaxExclusive0 = 10;
-        CheckFailure(Should.Throw<FullValidationException>(testNode.Validate,
-            "0 exclusive fails on 10"),
+        CheckFailure(
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on 10"),
             nameof(TestMinMaxNode.ValueRangeMaxExclusive0));
 
         testNode.ValueRangeMaxExclusive0 = -10;
         Should.NotThrow(testNode.Validate, "0 exclusive succeeds on -10");
 
         testNode.ValueRangeMaxExclusive0 = 0;
-        CheckFailure(Should.Throw<FullValidationException>(testNode.Validate,
-            "0 exclusive fails on 0"),
+        CheckFailure(
+            testNode.ShouldThrowValidationErrors<OutsideRangeValidationError>("0 exclusive fails on 0"),
             nameof(TestMinMaxNode.ValueRangeMaxExclusive0));
     }
 }

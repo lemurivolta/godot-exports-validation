@@ -13,7 +13,7 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
     public ValidateRangeAttributeBase(int multiplier, double min, string comparative)
     {
         this.multiplier = multiplier;
-        this.min = multiplier * min;
+        this.min = min;
         this.comparative = comparative;
     }
 
@@ -26,20 +26,14 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
             !memberType.IsAssignableTo(typeof(decimal))
             )
         {
-            return new(
-                $"Can check range only of float, double int and decimals, not of {memberType.Name}");
+            return WrongTypeValidationError(memberType);
         }
 
-        var value = multiplier * ToDouble(validationInfo.Value);
-        if (Inclusive && value < min)
-        {
-            return new($"must be {comparative} or equal than {min}");
-        }
-        else if (!Inclusive && value <= min)
-        {
-            return new($"must be {comparative} than {min}");
-        }
-        return null;
+        var value = ToDouble(validationInfo.Value);
+        return Inclusive && multiplier * value < multiplier * min ||
+            !Inclusive && multiplier * value <= multiplier * min
+            ? new OutsideRangeValidationError(comparative, min)
+            : (ValidationError?)null;
     }
 
     private static double ToDouble(object value) => value switch
@@ -50,4 +44,18 @@ public class ValidateRangeAttributeBase : NodeValidationBaseAttribute
         double dd => dd,
         _ => throw new ArgumentException("Unknown type", nameof(value)),
     };
+
+    internal class WrongTypeValidationError : ValidationError
+    {
+        public WrongTypeValidationError(Type? type) :
+            base($"Can check range only of float, double int and decimals, not of {(type == null ? "<null type>" : type.Name)}")
+        { }
+    }
+
+    internal class OutsideRangeValidationError : ValidationError
+    {
+        public OutsideRangeValidationError(string comparative, double extreme) :
+            base($"must be {comparative} or equal than {extreme}")
+        { }
+    }
 }
